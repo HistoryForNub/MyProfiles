@@ -1,0 +1,57 @@
+import os 
+import platform
+from datetime import datetime, timedelta
+import tkinter as tk
+from tkinter import ttk
+
+def schedule_shutdown(hour, minute):
+    current_time = datetime.now()
+    shutdown_time = datetime(current_time.year, current_time.month, current_time.day, hour, minute)
+
+    if current_time > shutdown_time:
+        shutdown_time += timedelta(days=1) # 如果指定時間已經過去，延後到下一天同一時間
+
+    time_difference = shutdown_time - current_time
+    seconds_until_shutdown = time_difference.total_seconds()
+
+    system_platform = platform.system()
+
+    if system_platform == "Windows":
+        os.system(f'shutdown /s /t {int(seconds_until_shutdown)}')
+    elif system_platform == "Linux" or system_platform == "Darwin":
+        os.system(f'shutdown -h +{int(seconds_until_shutdown // 60)}')
+
+def start_shutdown():
+    selected_hour = int(hour_var.get())
+    selected_minute = int(minute_var.get())
+    schedule_shutdown(selected_hour, selected_minute)
+
+
+root = tk.Tk()
+root.title("自動關機程式")
+root.geometry("250x100+150+150")
+root.resizable(width=0,height=0)
+
+# 設定時間標籤
+hour_label = ttk.Label(root, text="小時:")
+hour_label.grid(row=0, column=0, padx=5, pady=5)
+minute_label = ttk.Label(root, text="分鐘:")
+minute_label.grid(row=1, column=0, padx=5, pady=5)
+
+# 選擇時間的下拉菜單
+hour_var = tk.StringVar()
+hour_combobox = ttk.Combobox(root, textvariable=hour_var, values=[str(i) for i in range(24)])
+hour_combobox.grid(row=0, column=1, padx=5, pady=5)
+hour_combobox.set("17") # 預設選擇 17 小時
+
+minute_var = tk.StringVar()
+minute_combobox = ttk.Combobox(root, textvariable=minute_var, values=[str(i) for i in range(60)])
+minute_combobox.grid(row=1, column=1, padx=5, pady=5)
+minute_combobox.set("30") # 預設選擇 30 分鐘
+
+# 設定開始按鈕
+start_button = ttk.Button(root, text="開始自動關機", command=start_shutdown)
+start_button.grid(row=2, column=0, columnspan=2, pady=10)
+
+
+root.mainloop()
