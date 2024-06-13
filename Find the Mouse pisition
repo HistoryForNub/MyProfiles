@@ -1,0 +1,31 @@
+import tkinter as tk
+import pyautogui
+
+main_window = tk.Tk()
+main_window.geometry("300x180+200+100")
+main_window.title(string="Made By Rex")
+main_window.resizable(0,0)
+main_window.attributes("-topmost",True) #設定為最上層顯示
+
+main_window_frame = tk.Frame(main_window)
+main_window_frame.grid(row=0,column=0)
+
+def check_postion():
+
+    position = pyautogui.position()
+
+    label_check1.config(text=f"滑鼠位置X:={position.x}")
+    label_check2.config(text=f"滑鼠位置Y:={position.y}")
+    main_window.after(100,check_postion) #100毫秒後重新呼叫這個程序
+
+check_frame = tk.LabelFrame(main_window_frame,text="偵測位置")
+check_frame.grid(row=0,column=0,padx=5,pady=5)
+btn_check  = tk.Button(check_frame,text="測定位置",command= check_postion)
+btn_check.config(height=3,width=15)
+btn_check.grid(row=0 ,column= 0 ,padx= 5 ,pady=5)
+label_check1 = tk.Label(check_frame,text="滑鼠位置X:")
+label_check1.grid(row=1,column=0,padx= 5 ,pady=5)
+label_check2 = tk.Label(check_frame,text="滑鼠位置Y:")
+label_check2.grid(row=2,column=0,padx= 5 ,pady=5)
+
+main_window.mainloop()
