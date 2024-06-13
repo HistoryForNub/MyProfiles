@@ -1,0 +1,138 @@
+import os , datetime , docx 
+import tkinter as tk
+from tkinter import messagebox , simpledialog , Menu
+from tkinter import filedialog
+
+def oacc(log1,log3):
+    saver1 = open(r'C:\temp\config.txt',"r",encoding="utf-8").read()
+    saver2 = f"{saver1}/" + file_name_entry.cget("text")
+    with open(saver2,encoding="utf-8",mode="w") as tar1:
+        tar1.write('dim WshShell\n')
+        tar1.write('Set WshShell=WScript.CreateObject("WScript.Shell")\n')
+        tar1.write('WScript.Sleep 3000\n')
+        tar1.write('WshShell.SendKeys"' + log1 + '"\n')
+        tar1.write(r'WshShell.SendKeys"{TAB}"'+'\n')
+        tar1.write('WScript.Sleep 100\n')
+        tar1.write(f'WshShell.SendKeys"'+ log3 + '"\n')
+        tar1.write('WScript.Sleep 100\n')
+        tar1.write('WshShell.SendKeys"{ENTER}"')
+
+
+
+def folderchose():               #讓使用者選取路徑以便存放
+    target_path = filedialog.askdirectory()
+    if target_path != "":
+        messagebox.showinfo(title="設定路徑",message=f"設定路徑為 :  {target_path}")
+        write_file(target_path)
+    else:
+        messagebox.showerror(title="錯誤",message="尚未定義路徑!\n請重新選擇一次")
+        folderchose()
+    
+def write_file(target_path):
+    with open(r"C:\temp\config.txt",mode="w",encoding="utf-8") as file23:
+        file23.write(target_path)
+
+if os.path.exists(r"C:\temp\config.txt") :
+    with open(r"C:\temp\config.txt" , "r" , encoding="utf-8") as check1:
+        content = check1.read()
+        if not content.strip():
+            messagebox.showinfo(title="Rex出品，必屬精品",message="歡迎第一次使用，請先設定輸出的檔案路徑!")
+            folderchose()
+        
+
+else:
+    messagebox.showinfo(title="Rex出品，必屬精品",message="歡迎第一次使用，請先設定輸出的檔案路徑!")
+    folderchose()
+
+def about_me():
+    messagebox.showinfo("Rex出品，必屬精品","開發者Rex\n版本資訊:V1.02\n請依照相關規定使用，請勿做出超過所需權限之外動作!")
+
+main_window = tk.Tk()
+
+main_window.title("Rex出品，必屬精品")
+main_window.geometry("600x200+100+100")
+main_window.resizable(0,0)
+main_window.config(bg="#37474F")
+
+about_menu = Menu(main_window)
+about_menu.add_command(label="關於我",command=about_me)
+main_window.config(menu=about_menu)
+
+def setting_lable():
+    user_input = simpledialog.askstring("Rex出品，必屬精品","請輸入想要的檔案名稱")
+    if user_input is None:
+        messagebox.showerror("Rex出品，必屬精品","錯誤，請重新輸入")
+        setting_lable()
+    file_name_entry.config(text=(f"{user_input}.vbs"))
+
+def folderchange():
+    folderchose()
+    path_label.config(text=open(r"C:\temp\config.txt").read())
+
+top_frame = tk.LabelFrame(main_window,text="路徑選項")
+top_frame.config(bg="#37474F",fg="#FFFFFF",font="微軟正黑體 12")
+top_frame.grid(row=0,column=0,padx=5,pady=5,sticky="w")
+
+path_button = tk.Button(top_frame,text="請選取路徑",command=folderchange)
+path_button.config(height=1,width=21,bg="#37474F",fg="#FFFFFF",font="微軟正黑體 12")
+path_button.grid(row=0,column=0,padx=5,pady=5,sticky="w")
+
+path_label = tk.Label(top_frame,text="設定路徑為: " + open(r"C:\temp\config.txt").read())
+path_label.config(font="微軟正黑體 12",height=1,width=25,bg="#37474F",fg="#FFFFFF",justify="left")
+path_label.grid(row=0,column=1,padx=5,pady=5,sticky="w")
+
+
+file_name_button= tk.Button(top_frame,text="設定檔案名稱",command=setting_lable)
+file_name_button.config(width=21,font="微軟正黑體 12",bg="#37474F",fg="#FFFFFF")
+file_name_button.grid(row=1,column=0)
+file_name_entry = tk.Label(top_frame,font="微軟正黑體 12",text="Taiwandog.vbs",justify="left")
+file_name_entry.config(width=21,bg="#37474F",fg="#FFFFFF")
+file_name_entry.grid(row=1,column=1,padx=5,pady=5)
+
+main_frame = tk.LabelFrame(main_window)
+main_frame.config(text="請選取功能",font="微軟正黑體 12",bg="#37474F",fg="#FFFFFF")
+main_frame.grid(padx=5,pady=5,row=1,column=0,sticky="w")
+
+def creat_account():
+    file = r"\\twnasp106\SCBData\Share_desktop\share\dcr\02-IT_BAU\Jane\外點\1497841（棚軒）.docx"
+    file1 = docx.Document(r"\\twnasp106\SCBData\Share_desktop\share\dcr\02-IT_BAU\Jane\外點\1497841（棚軒）.docx")
+
+    t1 = os.path.getmtime(file)
+    t2 = datetime.datetime.fromtimestamp(t1)
+    t3 = t2.date()  
+    if t3 == datetime.date.today():
+        log1 = "o.1497841"
+        log2 = file1.paragraphs[1].text
+        log3 = log2.replace("%","{%}")
+        oacc(log1,log3)
+        messagebox.showinfo(title="設定寫入",message="設定寫入完成!")
+
+    else:
+        messagebox.showinfo(title="設定寫入",message="今天尚未收到新帳號，請等候!")
+
+def creat_account1():
+    file = r"\\twnasp106\SCBData\Share_desktop\share\dcr\02-IT_BAU\Jane\外點\1497844（楊欣）.docx"
+    file1 = docx.Document(r"\\twnasp106\SCBData\Share_desktop\share\dcr\02-IT_BAU\Jane\外點\1497844（楊欣）.docx")
+
+    t1 = os.path.getmtime(file)
+    t2 = datetime.datetime.fromtimestamp(t1)
+    t3 = t2.date()  
+    if t3 == datetime.date.today():
+        log1 = "o.1497844"
+        log2 = file1.paragraphs[1].text
+        log3 = log2.replace("%","{%}")
+        oacc(log1,log3)
+        messagebox.showinfo(title="設定寫入",message="設定寫入完成!")
+
+    else:
+        messagebox.showinfo(title="設定寫入",message="今天尚未收到新帳號，請等候!")
+
+button_1497841 = tk.Button(main_frame,text="帳號一",command=creat_account)
+button_1497841.config(width=15,bg="#37474F",fg="#FFFFFF")
+button_1497841.grid(padx=5,pady=5,row=0,column=0)
+
+button_1497844 = tk.Button(main_frame,text="帳號二",command=creat_account1)
+button_1497844.config(width=15,bg="#37474F",fg="#FFFFFF")
+button_1497844.grid(padx=5,pady=5,row=0,column=1)
+
+main_window.mainloop()
