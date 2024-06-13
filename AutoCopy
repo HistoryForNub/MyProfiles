@@ -1,0 +1,91 @@
+import tkinter as tk
+from tkinter import messagebox , filedialog
+from tkinter import ttk
+import shutil
+import os
+from threading import Thread
+
+def copy_directory(source, target, progress_bar):
+    
+    num_files = sum(len(files) for _, _, files in os.walk(source))
+    copy_count = 0
+
+    for dirpath, _, filenames in os.walk(source):
+        destination = os.path.join(target, os.path.relpath(dirpath, source))
+        os.makedirs(destination, exist_ok=True)
+        for filename in filenames:
+            src_file = os.path.join(dirpath, filename)
+            dest_file = os.path.join(destination, filename)
+            shutil.copy2(src_file, dest_file)
+            copy_count += 1
+            progress = int((copy_count / num_files) * 100)
+            progress_bar['value'] = progress
+            window.update_idletasks()
+    def on_complete():
+        messagebox.showinfo("完成","請聯絡Rex 1645119")
+        os.system(r'explorer.exe C:\temp\Rex')
+        window.destroy()
+
+
+    window.after(0,on_complete)
+
+
+def start_copyingSEP():
+    if not os.path.exists(r'G:'):
+        messagebox.showerror(title="警告!",message="該路徑不存在")
+        return
+    
+    elif os.path.exists(r"C:\temp\Rex"):
+        shutil.rmtree(r"C:\temp\Rex")
+    source = r"G:\Share_desktop\share\dcr\02-IT_BAU\Rex\Other\封存\SEP\CleanWipe 14.3_RU2"  # Set your source path here
+    target = r"C:\temp\Rex"  # Set your target path here
+    thread = Thread(target=copy_directory, args=(source, target, progress_bar))
+    thread.start()
+
+def start_copyingHotfix():
+    if not os.path.exists(r'G:'):
+        messagebox.showerror(title="警告!",message="該路徑不存在")
+        return    
+    elif os.path.exists(r"C:\temp\Rex"):
+        shutil.rmtree(r"C:\temp\Rex")
+    source = r"G:\Share_desktop\share\dcr\02-IT_BAU\Rex\Hotfix"  # Set your source path here
+    target = r"C:\temp\Rex"  # Set your target path here
+    thread = Thread(target=copy_directory, args=(source, target, progress_bar))
+    thread.start()
+
+def start_copying():
+
+    if os.path.exists(r"C:\temp\Rex"):
+        shutil.rmtree(r"C:\temp\Rex")
+    source = filedialog.askdirectory(title="請選取資料夾")  # Set your source path here
+    if source == "" :
+        return
+    target = r"C:\temp\Rex"  # Set your target path here
+    thread = Thread(target=copy_directory, args=(source, target, progress_bar))
+    thread.start()
+
+
+# Create the main window
+window = tk.Tk()
+window.title("Rex製作，必屬精品")
+window.geometry("380x180+200+200")
+window.resizable(0,0)
+fram1 = tk.LabelFrame(window,text="請選取功能")
+fram1.grid(row=0,column=0,padx=10,pady=10)
+
+fram2 = tk.LabelFrame(window,text="進度條")
+fram2.grid(row=1,column=0,padx=10,pady=10)
+# Create a progress bar
+
+
+# Add a button to start the copy process
+sistuation_1 = tk.Button(fram1, text="SEP解除安裝", command=start_copyingSEP,width=15)
+sistuation_1.grid(row=0,column=0,pady=10)
+sistuation_2 = tk.Button(fram1, text="Hotfix更新", command=start_copyingHotfix,width=15)
+sistuation_2.grid(row=0,column=1,pady=10)
+sistuation_3 = tk.Button(fram1, text="選擇資料夾", command=start_copying,width=15)
+sistuation_3.grid(row=0,column=2,pady=10)
+
+progress_bar = ttk.Progressbar(fram2, length=340, mode='determinate')
+progress_bar.grid(pady=10)
+window.mainloop()
