@@ -1,0 +1,35 @@
+import socket
+import pyperclip 
+import tkinter as tk
+main_window = tk.Tk()
+main_window.title("電腦資訊")
+main_window.geometry("250x135+200+100")
+main_window.resizable(0,0)
+main_frame = tk.Frame(main_window)
+main_frame.config(bg="#AD1457")
+main_frame.pack(fill="x")
+user_info = tk.LabelFrame(main_frame)
+user_info.config(text="電腦資訊",font="微軟正黑體 13",bg="#AD1457",fg="#FFFFFF")
+user_info.grid(column=0,row=0,padx=5,pady=5)
+
+def get_IP():
+    IP = socket.gethostbyname(socket.gethostname())
+    pyperclip.copy(IP)
+
+def get_hsn():
+    HSN_name = socket.gethostname()
+    pyperclip.copy(HSN_name)
+
+ip_button = tk.Button(user_info,text="IP位置",command=get_IP,font="微軟正黑體 13",bg="#AD1457",fg="#FFFFFF")
+ip_button.grid(row=0,column=0,padx=5,pady=5,sticky="news")
+
+ip_label = tk.Label(user_info,text=socket.gethostbyname(socket.gethostname()),font="微軟正黑體 13",bg="#AD1457",fg="#FFFFFF")
+ip_label.grid(row=0,column=1,padx=5,pady=5,sticky="news")
+
+HSN = tk.Button(user_info,text="電腦名稱",font="微軟正黑體 13",bg="#AD1457",fg="#FFFFFF",command=get_hsn)
+HSN.grid(row=1,column=0,padx=5,pady=5,sticky="news")
+
+HSN_label = tk.Label(user_info,text=socket.gethostname(),font="微軟正黑體 13",bg="#AD1457",fg="#FFFFFF")
+HSN_label.grid(row=1,column=1,padx=5,pady=5,sticky="news")
+
+main_window.mainloop()
