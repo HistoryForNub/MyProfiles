@@ -26,9 +26,9 @@ def reseting():
 def check_file():
     global target
     file_path = filedialog.askopenfilename()
-    wk = open(r"D:\檔案檢索系統\user_settings.txt", mode="w", encoding="utf-8")
-    wk.write(file_path)
-    wk.close()
+    with open(r"D:\檔案檢索系統\user_settings.txt", mode="w", encoding="utf-8") as wk:
+        wk.write(file_path)
+
     if not file_path:
         messagebox.showerror(message="請重新設定。", title="錯誤")
         return
@@ -47,7 +47,6 @@ def check_file():
             data.append(list(row))
 
         for row in data:
-            # print(row)
             target.append(row)
         wb.close()
         messagebox.showinfo(message="文件讀取成功。", title="成功")
@@ -58,7 +57,7 @@ def check_file():
         messagebox.showerror(message=f"出現錯誤：{e}", title="錯誤")
 
 
-def id_check():
+def id_check(event=None):
     result_car_number.delete(0, "end")
     result_ID.delete(0, "end")
     result_Location1.delete(0, "end")
@@ -72,7 +71,6 @@ def id_check():
     elif check_name.get() is None or check_name.get() == "":
         messagebox.showerror("錯誤", "尚未設定檔案編號")
     else:
-        # 在陣列中尋找
         find_list = check_name.get()
         for item in target:
             if item[0] == find_list:
@@ -102,22 +100,21 @@ def copy_to_clipboard(event):
 # 檢查是否是第一次使用
 if os.path.exists(r"D:\檔案檢索系統\user_settings.txt"):
     pa = r"D:\檔案檢索系統\user_settings.txt"
-    da = open(pa, mode='r', encoding="utf-8")
-    try:
-        wb = openpyxl.load_workbook(da.read())
-        ws = wb.worksheets[0]
-        data = []
+    with open(pa, mode='r', encoding="utf-8") as da:
+        try:
+            wb = openpyxl.load_workbook(da.read())
+            ws = wb.worksheets[0]
+            data = []
 
-        # 遍历每一行
-        for row in ws.iter_rows(values_only=True):
-            data.append(list(row))
+            for row in ws.iter_rows(values_only=True):
+                data.append(list(row))
 
-        for row in data:
-            # print(row)
-            target.append(row)
-        messagebox.showinfo(message="文件讀取成功。", title="成功")
-    except:
-        messagebox.showerror(message="文件不存在。", title="錯誤")
+            for row in data:
+                target.append(row)
+            wb.close()
+            messagebox.showinfo(message="文件讀取成功。", title="成功")
+        except:
+            messagebox.showerror(message="文件不存在。", title="錯誤")
 else:
     messagebox.showinfo("歡迎第一次使用", "請先設定檔案路徑")
     check_file()
@@ -143,6 +140,7 @@ check_lable = tk.Label(main_frame, text="檔案編號 :",
                        font=font_settings, bg=bg_color, fg=fg_color)
 check_lable.grid(row=1, column=0, padx=10, pady=5)
 check_name = tk.Entry(main_frame, font=font_settings, bg=bg_color, fg=fg_color)
+check_name.bind("<Return>", id_check)  # 绑定Enter键事件
 check_name.config(width=12)
 check_name.grid(row=2, column=0, padx=10, pady=5)
 id_check_button = tk.Button(main_frame, command=id_check,
