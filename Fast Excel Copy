@@ -1,0 +1,207 @@
+import openpyxl
+import os
+import tkinter as tk
+from tkinter import filedialog, messagebox
+
+target = []
+
+
+def clear_all():
+    result_car_number.delete(0, "end")
+    result_ID.delete(0, "end")
+    result_Location1.delete(0, "end")
+    result_Location2.delete(0, "end")
+    result_name.delete(0, "end")
+    result_phone.delete(0, "end")
+    check_name.delete(0, "end")
+    check_name.focus()
+
+
+def reseting():
+    global target
+    target.clear()
+    check_file()
+
+
+def check_file():
+    global target
+    file_path = filedialog.askopenfilename()
+    wk = open(r"D:\檔案檢索系統\user_settings.txt", mode="w", encoding="utf-8")
+    wk.write(file_path)
+    wk.close()
+    if not file_path:
+        messagebox.showerror(message="請重新設定。", title="錯誤")
+        return
+
+    if not os.path.exists(file_path):
+        messagebox.showerror(message="文件不存在。", title="錯誤")
+        return
+
+    try:
+        wb = openpyxl.load_workbook(file_path)
+        ws = wb.worksheets[0]
+        data = []
+
+        # 遍历每一行
+        for row in ws.iter_rows(values_only=True):
+            data.append(list(row))
+
+        for row in data:
+            # print(row)
+            target.append(row)
+        wb.close()
+        messagebox.showinfo(message="文件讀取成功。", title="成功")
+
+    except openpyxl.utils.exceptions.InvalidFileException:
+        messagebox.showerror(message="錯誤選取檔案類型", title="錯誤")
+    except Exception as e:
+        messagebox.showerror(message=f"出現錯誤：{e}", title="錯誤")
+
+
+def id_check():
+    result_car_number.delete(0, "end")
+    result_ID.delete(0, "end")
+    result_Location1.delete(0, "end")
+    result_Location2.delete(0, "end")
+    result_name.delete(0, "end")
+    result_phone.delete(0, "end")
+    global target
+    if not target:
+        messagebox.showerror("錯誤", "尚未設定檔案的路徑")
+        check_file()
+    elif check_name.get() is None or check_name.get() == "":
+        messagebox.showerror("錯誤", "尚未設定檔案編號")
+    else:
+        # 在陣列中尋找
+        find_list = check_name.get()
+        for item in target:
+            if item[0] == find_list:
+                messagebox.showinfo("讀取成功", "請查看頁面")
+                result_name.insert(0, item[1])
+                result_ID.insert(0, item[2])
+                result_Location1.insert(0, item[3])
+                result_Location2.insert(0, item[4])
+                result_phone.insert(0, item[5])
+                result_car_number.insert(0, item[6])
+
+
+def top_most_event():
+    if top_most_var.get():
+        main_window.attributes("-topmost", True)
+    else:
+        main_window.attributes("-topmost", False)
+
+
+def copy_to_clipboard(event):
+    widget = event.widget
+    main_window.clipboard_clear()
+    main_window.clipboard_append(widget.get())
+    messagebox.showinfo("已複製", "內容已複製到剪貼簿")
+
+
+# 檢查是否是第一次使用
+if os.path.exists(r"D:\檔案檢索系統\user_settings.txt"):
+    pa = r"D:\檔案檢索系統\user_settings.txt"
+    da = open(pa, mode='r', encoding="utf-8")
+    try:
+        wb = openpyxl.load_workbook(da.read())
+        ws = wb.worksheets[0]
+        data = []
+
+        # 遍历每一行
+        for row in ws.iter_rows(values_only=True):
+            data.append(list(row))
+
+        for row in data:
+            # print(row)
+            target.append(row)
+        messagebox.showinfo(message="文件讀取成功。", title="成功")
+    except:
+        messagebox.showerror(message="文件不存在。", title="錯誤")
+else:
+    messagebox.showinfo("歡迎第一次使用", "請先設定檔案路徑")
+    check_file()
+
+# Insert data Pages
+main_window = tk.Tk()
+main_window.geometry("500x300+100+100")
+main_window.title("檔案檢索系統")
+main_window.attributes("-topmost", False)
+main_window.configure(bg='#bd88b4')
+
+font_settings = ("微軟正黑體", 12)
+bg_color = "#bd88b4"
+fg_color = "white"
+
+main_frame = tk.LabelFrame(main_window, text="功能區塊",
+                           font=font_settings, bg=bg_color, fg=fg_color)
+main_frame.grid(row=0, column=0, padx=10, pady=5)
+file_path = tk.Button(main_frame, command=reseting,
+                      text="檔案位置設定", font=font_settings, bg=bg_color, fg=fg_color)
+file_path.grid(row=0, column=0, padx=10, pady=5)
+check_lable = tk.Label(main_frame, text="檔案編號 :",
+                       font=font_settings, bg=bg_color, fg=fg_color)
+check_lable.grid(row=1, column=0, padx=10, pady=5)
+check_name = tk.Entry(main_frame, font=font_settings, bg=bg_color, fg=fg_color)
+check_name.config(width=12)
+check_name.grid(row=2, column=0, padx=10, pady=5)
+id_check_button = tk.Button(main_frame, command=id_check,
+                            text="搜尋ID", font=font_settings, bg=bg_color, fg=fg_color)
+id_check_button.grid(row=3, column=0, padx=10, pady=5)
+
+top_most_var = tk.BooleanVar()
+top_most = tk.Checkbutton(main_frame, text="最上層顯示", variable=top_most_var, command=top_most_event,
+                          font=font_settings, bg=bg_color, fg=fg_color, selectcolor=bg_color)
+top_most.grid(row=5, column=0, padx=10, pady=5)
+clear_button = tk.Button(main_frame, command=clear_all,
+                         text="清除資料", font=font_settings, bg=bg_color, fg=fg_color)
+clear_button.grid(row=4, column=0, padx=10, pady=5)
+
+# Result Page
+result_frame = tk.LabelFrame(
+    main_window, text="查詢結果", font=font_settings, bg=bg_color, fg=fg_color)
+result_frame.grid(row=0, column=1, padx=5, pady=5)
+
+tk.Label(result_frame, text="姓名", font=font_settings, bg=bg_color,
+         fg=fg_color).grid(row=0, column=0, padx=5, pady=5)
+result_name = tk.Entry(result_frame, font=font_settings,
+                       bg=bg_color, fg=fg_color)
+result_name.grid(row=0, column=1, padx=5, pady=5)
+
+tk.Label(result_frame, text="身分證字號", font=font_settings, bg=bg_color,
+         fg=fg_color).grid(row=1, column=0, padx=5, pady=5)
+result_ID = tk.Entry(result_frame, font=font_settings,
+                     bg=bg_color, fg=fg_color)
+result_ID.grid(row=1, column=1, padx=5, pady=5)
+
+tk.Label(result_frame, text="居住地址", font=font_settings, bg=bg_color,
+         fg=fg_color).grid(row=2, column=0, padx=5, pady=5)
+result_Location1 = tk.Entry(
+    result_frame, font=font_settings, bg=bg_color, fg=fg_color)
+result_Location1.grid(row=2, column=1, padx=5, pady=5)
+
+tk.Label(result_frame, text="戶籍地址", font=font_settings, bg=bg_color,
+         fg=fg_color).grid(row=3, column=0, padx=5, pady=5)
+result_Location2 = tk.Entry(
+    result_frame, font=font_settings, bg=bg_color, fg=fg_color)
+result_Location2.grid(row=3, column=1, padx=5, pady=5)
+
+tk.Label(result_frame, text="電話", font=font_settings, bg=bg_color,
+         fg=fg_color).grid(row=4, column=0, padx=5, pady=5)
+result_phone = tk.Entry(result_frame, font=font_settings,
+                        bg=bg_color, fg=fg_color)
+result_phone.grid(row=4, column=1, padx=5, pady=5)
+
+tk.Label(result_frame, text="車牌號碼", font=font_settings, bg=bg_color,
+         fg=fg_color).grid(row=5, column=0, padx=5, pady=5)
+result_car_number = tk.Entry(
+    result_frame, font=font_settings, bg=bg_color, fg=fg_color)
+result_car_number.grid(row=5, column=1, padx=5, pady=5)
+
+# Bind double-click event to all Entry widgets
+entries = [check_name, result_name, result_ID, result_Location1,
+           result_Location2, result_phone, result_car_number]
+for entry in entries:
+    entry.bind("<Double-Button-1>", copy_to_clipboard)
+
+main_window.mainloop()
